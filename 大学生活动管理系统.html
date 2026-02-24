@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 手机端核心适配标签【必带】苹果+安卓通用，缺一不可 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <title>大学生活动管理系统</title>
+    <style>
+        /* 顶部小英文字母 - 你的要求 */
+        .cute-top-text {
+            text-align: center;
+            font-family: "PingFang SC","微软雅黑", sans-serif;
+            font-size: 16px;
+            color: rgb(100, 60, 170);
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            letter-spacing: 2px;
+        }
+        /* 全局样式 - 淡紫色渐变背景 */
+        body {
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+            background: linear-gradient(rgb(230, 210, 255), rgb(200, 170, 240));
+            font-family: "PingFang SC","微软雅黑", sans-serif;
+            box-sizing: border-box;
+            font-size: 16px;
+            /* 手机点击无高亮，优化体验 */
+            -webkit-tap-highlight-color: transparent;
+            tap-highlight-color: transparent;
+        }
+        /* 主体白色盒子 - 手机适配宽度 */
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgb(255, 255, 255);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(160, 120, 220, 0.2);
+            box-sizing: border-box;
+        }
+        /* 系统大标题 */
+        h1 {
+            text-align: center;
+            color: rgb(90, 50, 150);
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        /* 角色切换按钮 - 手机点击优化 重点！ */
+        .role-switch {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .role-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            background: rgb(160, 120, 220);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            /* 解决手机按钮原生样式冲突 */
+            -webkit-appearance: none;
+            appearance: none;
+            touch-action: manipulation;
+        }
+        .role-btn.active {
+            background: rgb(90, 50, 150);
+        }
+        /* 表单样式 - 手机核心适配 重点！ */
+        .form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgb(230, 210, 255);
+            margin-bottom: 15px;
+        }
+        .form input {
+            padding: 10px 12px;
+            border: 1px solid rgb(200, 170, 240);
+            border-radius: 6px;
+            width: calc(50% - 10px);
+            min-width: 140px;
+            font-size: 15px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            box-sizing: border-box;
+        }
+        /* 奖励细则输入框加宽，方便填写 */
+        .form input.reward-input {
+            width: calc(100% - 10px);
+        }
+        /* 所有按钮统一样式 - 手机点击必灵 重点！ */
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            background: rgb(160, 120, 220);
+            color: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            -webkit-appearance: none;
+            appearance: none;
+            touch-action: manipulation;
+            border: 0;
+        }
+        button:active {
+            background: rgb(90, 50, 150);
+        }
+        /* 表格滚动容器 - 手机滑动丝滑 重点！ */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 15px;
+            width: 100%;
+            /* 苹果专属顺滑滚动 */
+            -webkit-overflow-scrolling: touch;
+            overflow-scrolling: touch;
+        }
+        /* 表格样式 */
+        table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid rgb(200, 170, 240);
+            padding: 8px 5px;
+            font-size: 14px;
+        }
+        th {
+            background: rgb(230, 210, 255);
+            color: rgb(90, 50, 150);
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: rgb(248, 245, 255);
+        }
+        /* 模块显隐 */
+        .module {
+            display: none;
+        }
+        .module.active {
+            display: block;
+        }
+        /* 提示文字 */
+        .tips {
+            text-align: center;
+            color: rgb(120, 80, 180);
+            margin: 8px 0;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ✅ 顶部小英文字母 -->
+        <div class="cute-top-text">xmr&lxt little creation</div>
+        <!-- 系统标题 -->
+        <h1>🎡 大学生活动管理系统</h1>
+        <!-- 角色切换 -->
+        <div class="role-switch">
+            <button class="role-btn active" onclick="switchRole('student')">学生端</button>
+            <button class="role-btn" onclick="switchRole('admin')">管理员端</button>
+        </div>
+
+        <!-- ✅ 学生端 - 手机可正常报名/查记录/取消报名 -->
+        <div class="module active" id="studentModule">
+            <div class="form">
+                <input type="text" id="stuId" placeholder="请输入学号">
+                <input type="text" id="stuName" placeholder="请输入姓名">
+                <button onclick="queryMySign()">查看我的报名</button>
+            </div>
+            <h3 class="tips">活动列表（点击报名）</h3>
+            <div class="table-container">
+                <table id="studentActivityTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>活动名称</th>
+                            <th>时间</th>
+                            <th>地点</th>
+                            <th>奖励细则</th>
+                            <th>剩余名额</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <h3 class="tips">我的报名记录</h3>
+            <div class="table-container">
+                <table id="mySignTable">
+                    <thead>
+                        <tr>
+                            <th>活动名称</th>
+                            <th>时间</th>
+                            <th>奖励</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ✅ 管理员端 - 手机可正常登录/加活动/填奖励/删活动/查报名 -->
+        <div class="module" id="adminModule">
+            <div class="form">
+                <input type="text" id="adminPwd" placeholder="管理员密码 123456">
+                <button onclick="adminLogin()">登录</button>
+            </div>
+            <div id="adminFunc" style="display: none;">
+                <div class="form">
+                    <input type="text" id="actName" placeholder="活动名称">
+                    <input type="text" id="actTime" placeholder="时间 例：2026-01-20">
+                    <input type="text" id="actAddr" placeholder="活动地点">
+                    <input type="number" id="actLimit" placeholder="人数限制">
+                    <input type="text" id="actReward" class="reward-input" placeholder="奖励细则 例：综测+2分/证书">
+                    <button onclick="addActivity()">添加活动</button>
+                </div>
+                <h3 class="tips">活动管理列表</h3>
+                <div class="table-container">
+                    <table id="adminActivityTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>活动名称</th>
+                                <th>时间</th>
+                                <th>地点</th>
+                                <th>奖励细则</th>
+                                <th>报名/上限</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <h3 class="tips">报名详情（点击查看）</h3>
+                <div class="table-container">
+                    <table id="signDetailTable">
+                        <thead>
+                            <tr>
+                                <th>学号</th>
+                                <th>姓名</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局数据
+        let activities = [];
+        let signRecords = [];
+        let activityIdCounter = 1;
+
+        // 1. 角色切换 - 手机端正常切换
+        function switchRole(role) {
+            document.getElementById('studentModule').className = role === 'student' ? 'module active' : 'module';
+            document.getElementById('adminModule').className = role === 'admin' ? 'module active' : 'module';
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.className = btn.innerText.indexOf(role === 'student' ? '学生' : '管理') > -1 ? 'role-btn active' : 'role-btn';
+            });
+            renderStudentActivityTable();
+        }
+
+        // 2. 管理员登录 - 手机点击正常触发
+        function adminLogin() {
+            const pwd = document.getElementById('adminPwd').value.trim();
+            if (pwd === '123456') {
+                document.getElementById('adminFunc').style.display = 'block';
+                renderAdminActivityTable();
+                alert('管理员登录成功！');
+            } else {
+                alert('密码错误，默认密码：123456');
+            }
+        }
+
+        // 3. 管理员添加活动+奖励细则 - 手机可正常添加
+        function addActivity() {
+            const name = document.getElementById('actName').value.trim();
+            const time = document.getElementById('actTime').value.trim();
+            const addr = document.getElementById('actAddr').value.trim();
+            const limit = document.getElementById('actLimit').value.trim();
+            const reward = document.getElementById('actReward').value.trim() || '无奖励';
+
+            if (!name || !time || !addr || !limit) {
+                alert('请填写：活动名称、时间、地点、人数限制！');
+                return;
+            }
+            // 添加活动数据
+            activities.push({
+                id: 'act' + activityIdCounter++,
+                name, time, addr, limit: Number(limit), reward, signCount: 0
+            });
+            // 刷新表格
+            renderAdminActivityTable();
+            renderStudentActivityTable();
+            // 清空输入框
+            document.getElementById('actName').value = '';
+            document.getElementById('actTime').value = '';
+            document.getElementById('actAddr').value = '';
+            document.getElementById('actLimit').value = '';
+            document.getElementById('actReward').value = '';
+            alert('活动添加成功！');
+        }
+
+        // 4. 学生报名活动 - 手机点击报名正常触发
+        function signActivity(actId) {
+            const stuId = document.getElementById('stuId').value.trim();
+            const stuName = document.getElementById('stuName').value.trim();
+            if (!stuId || !stuName) {
+                alert('请先填写你的学号和姓名！');
+                return;
+            }
+            const act = activities.find(item => item.id === actId);
+            if (act.signCount >= act.limit) {
+                alert('该活动名额已满！');
+                return;
+            }
+            const isSign = signRecords.some(item => item.stuId === stuId && item.actId === actId);
+            if (isSign) {
+                alert('你已报名该活动，无需重复报名！');
+                return;
+            }
+            // 新增报名记录
+            signRecords.push({ stuId, stuName, actId });
+            act.signCount++;
+            renderStudentActivityTable();
+            renderAdminActivityTable();
+            alert('报名成功！');
+        }
+
+        // 5. 学生取消报名 - 手机正常触发
+        function cancelSign(actId) {
+            const stuId = document.getElementById('stuId').value.trim();
+            const idx = signRecords.findIndex(item => item.stuId === stuId && item.actId === actId);
+            if (idx === -1) {
+                alert('未找到你的报名记录！');
+                return;
+            }
+            signRecords.splice(idx, 1);
+            const act = activities.find(item => item.id === actId);
+            act.signCount--;
+            renderStudentActivityTable();
+            renderAdminActivityTable();
+            queryMySign();
+            alert('取消报名成功！');
+        }
+
+        // 6. 学生查询报名记录 - 手机正常查看
+        function queryMySign() {
+            const stuId = document.getElementById('stuId').value.trim();
+            if (!stuId) {
+                alert('请输入你的学号！');
+                return;
+            }
+            const mySign = signRecords.filter(item => item.stuId === stuId);
+            const tbody = document.getElementById('mySignTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            if (mySign.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">暂无报名记录</td></tr>';
+                return;
+            }
+            mySign.forEach(item => {
+                const act = activities.find(a => a.id === item.actId);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${act.name}</td><td>${act.time}</td><td>${act.reward}</td><td><button onclick="cancelSign('${act.id}')">取消</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 7. 管理员查看报名详情 - 手机正常查看
+        function viewSignDetail(actId) {
+            const signList = signRecords.filter(item => item.actId === actId);
+            const tbody = document.getElementById('signDetailTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            if (signList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="2">暂无报名</td></tr>';
+                return;
+            }
+            signList.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${item.stuId}</td><td>${item.stuName}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 8. 管理员删除活动 - 手机正常删除
+        function deleteActivity(actId) {
+            if (confirm('确定删除该活动？报名记录也会删除！')) {
+                activities = activities.filter(item => item.id !== actId);
+                signRecords = signRecords.filter(item => item.actId !== actId);
+                renderAdminActivityTable();
+                renderStudentActivityTable();
+                alert('活动删除成功！');
+            }
+        }
+
+        // 渲染学生端活动列表
+        function renderStudentActivityTable() {
+            const tbody = document.getElementById('studentActivityTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            if (activities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">暂无活动，敬请期待</td></tr>';
+                return;
+            }
+            activities.forEach(act => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${act.id}</td>
+                    <td>${act.name}</td>
+                    <td>${act.time}</td>
+                    <td>${act.addr}</td>
+                    <td>${act.reward}</td>
+                    <td>${act.limit - act.signCount}</td>
+                    <td><button onclick="signActivity('${act.id}')">报名</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 渲染管理员端活动列表
+        function renderAdminActivityTable() {
+            const tbody = document.getElementById('adminActivityTable').querySelector('tbody');
+            tbody.innerHTML = '';
+            if (activities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">暂无活动，点击添加</td></tr>';
+                return;
+            }
+            activities.forEach(act => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${act.id}</td>
+                    <td>${act.name}</td>
+                    <td>${act.time}</td>
+                    <td>${act.addr}</td>
+                    <td>${act.reward}</td>
+                    <td>${act.signCount}/${act.limit}</td>
+                    <td>
+                        <button onclick="viewSignDetail('${act.id}')">查看报名</button>
+                        <button onclick="deleteActivity('${act.id}')">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 初始化加载
+        renderStudentActivityTable();
+    </script>
+</body>
+</html>
